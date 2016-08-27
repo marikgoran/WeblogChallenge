@@ -29,7 +29,7 @@ Weblog challenge - parsing weblogs with big data tools
 
 - The pyspark code is in python3, so it needs to be have `PYSPARK_PYTHON=python3` in the environment: `PYSPARK_PYTHON=python3 spark-submit sessionize.spark.py`. The latest python3.5.2 from homebrew was used in the development, but 3.2+ should work as well.
 - The Pig code needs to source the datafu.jar, which is included in the repo. It can be run with `pig -x local sessionize.pig`
-- Both scripts by default will output the answer of the question 4 from the [Processing & Analytical goals] section above.
+- Both scripts will by default output the answer of the question 4 from the [Processing & Analytical goals] section above.
 - Unfortunately the scripts are not fully automated at the moment, so some commenting and un-commenting in the code are needed in order to get the output for the other questions.
 - The Pig script **does not** give a correct answer on question 3 at the moment - that code is in development and should be ready soon.
 
