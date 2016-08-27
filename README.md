@@ -1,9 +1,8 @@
 # WeblogChallenge
-This is an interview challenge for Paytm Labs. Please feel free to fork. Pull Requests will be ignored.
+Weblog challenge - parsing weblogs with big data tools
 
-The challenge is to make make analytical observations about the data using the distributed tools below.
 
-##Processing & Analytical goals:
+###Processing & Analytical goals:
 
 1. Sessionize the web log by IP. Sessionize = aggregrate all page hits by visitor/IP during a fixed time window.
     https://en.wikipedia.org/wiki/Session_(web_analytics)
@@ -15,46 +14,25 @@ The challenge is to make make analytical observations about the data using the d
 4. Find the most engaged users, ie the IPs with the longest session times
 
 
+###Tools used:
+- Spark 2.0 via pyspark
+- Pig 0.16 with the datafu 1.2.0 library
 
-###Tools allowed (in no particular order):
-- Spark (any language, but prefer Scala)
-- Pig
-- MapReduce (Hadoop 2.x only)
-- Flink
-- Cascading, Cascalog, or Scalding
+###How to use and run the code
+- The code was developed and tested on OSX 10.9 with up to date Homebrew. Spark and Pig were installed with "brew install apache-spark pig" and both run in local mode with JDK 1.8.0_102
+- Besides the full dataset in `data/`, there is a smaller sample dataset in `sample.log` for quick tests during the interactive development. 
+- The large dataset needs to be manually unpacked in a file called `full.log` in the same directory where the scripts are located:
 
-If you need Hadoop, we suggest 
-HDP Sandbox:
-http://hortonworks.com/hdp/downloads/
-or 
-CDH QuickStart VM:
-http://www.cloudera.com/content/cloudera/en/downloads.html
+		git clone git@github.com:marikgoran/WeblogChallenge.git
+		cd WeblogChallenge
+		gunzip -c data/2015_07_22_mktplace_shop_web_log_sample.log.gz > full.log
 
+- The pyspark code is in python3, so it needs to be have `PYSPARK_PYTHON=python3` in the environment: `PYSPARK_PYTHON=python3 spark-submit sessionize.spark.py`. The latest python3.5.2 from homebrew was used in the development, but 3.2+ should work as well.
+- The Pig code needs to source the datafu.jar, which is included in the repo. It can be run with `pig -x local sessionize.pig`
+- Both scripts by default will output the answer of the question 4 from the [Processing & Analytical goals] section above.
+- Unfortunately the scripts are not fully automated at the moment, so some commenting and un-commenting in the code are needed in order to get the output for the other questions.
+- The Pig script **does not** give a correct answer on question 3 at the moment - that code is in development and should be ready soon.
 
-###Additional notes:
-- You are allowed to use whatever libraries/parsers/solutions you can find provided you can explain the functions you are implementing in detail.
+--
+###Additional notes and comments:
 - IP addresses do not guarantee distinct users, but this is the limitation of the data. As a bonus, consider what additional data would help make better analytical conclusions
-- For this dataset, complete the sessionization by time window rather than navigation. Feel free to determine the best session window time on your own, or start with 15 minutes.
-- The log file was taken from an AWS Elastic Load Balancer:
-http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/access-log-collection.html#access-log-entry-format
-
-
-
-##How to complete this challenge:
-
-A. Fork this repo in github
-    https://github.com/PaytmLabs/WeblogChallenge
-
-B. Complete the processing and analytics as defined first to the best of your ability with the time provided.
-
-C. Place notes in your code to help with clarity where appropriate. Make it readable enough to present to the Paytm Labs interview team.
-
-D. Complete your work in your own github repo and send the results to us and/or present them during your interview.
-
-##What are we looking for? What does this prove?
-
-We want to see how you handle:
-- New technologies and frameworks
-- Messy (ie real) data
-- Understanding data transformation
-This is not a pass or fail test, we want to hear about your challenges and your successes with this particular problem.

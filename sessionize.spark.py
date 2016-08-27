@@ -1,11 +1,12 @@
 from datetime import datetime
 from pyspark import SparkConf, SparkContext
-import uuid,sys
+import uuid
 
 conf = SparkConf().setMaster("local").setAppName("PayTM")
 sc = SparkContext(conf=conf)
 SESSION_THRESHOLD = 15*60
-
+INPUT_FILE='sample.log'
+#INPUT_FILE='full.log'
 
 def get_data(elem):
     """
@@ -62,21 +63,25 @@ def tag_sessions(elem):
                      'length': previous_tstamp-start_tstamp})
     return sessions
 
-logs = sc.textFile('/Users/gmarik/workspace/Code/python/spark/sample.log')
-# logs = sc.textFile('/Users/gmarik/workspace/Code/python/spark/full.log')
-
-# sessions = logs.map(get_data).groupByKey()
+logs = sc.textFile(INPUT_FILE)
+# 1)
 sessions = logs.map(get_data).groupByKey().flatMap(tag_sessions)
 
-# engaged_users = sessions.map(lambda item: (item['length'], item)).sortByKey(ascending=False)
-#global session avg
-# total_time = sessions.map(lambda item: item['length']).reduce(lambda a,b: a+b)
-# print ("Global session avg: ", total_time / sessions.count())
+# 2)
+total_time = sessions.map(lambda item: item['length']).reduce(lambda a,b: a+b)
+print ("Global session avg: ", total_time / sessions.count())
+
+# 3) The unique hits per session are already included in 1), here we will just sort them using that value as key
+
+# 4)
+engaged_users = sessions.map(lambda item: (item['length'], item)).sortByKey(ascending=False)
 
 
-output = sessions.collect()
-# output = engaged_users.collect()
-for out in output:
+## Answer section ##
+# limit the answers to 10 entries each, for speed and simplicity
+
+# answer1 = sessions.take(10)
+answer4 = engaged_users.collect()
+for out in answer4:
    print ("***",out)
-print ("over and done")
 

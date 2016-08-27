@@ -1,8 +1,10 @@
 REGISTER /usr/local/Cellar/pig/0.16.0/libexec/lib/piggybank.jar;
-REGISTER /usr/local/Cellar/pig/0.16.0/libexec/lib/datafu.jar;
+REGISTER datafu.jar;
 DEFINE Sessionize datafu.pig.sessions.Sessionize('900s');
 
-input_data = load 'small-tz-ip.log' USING org.apache.pig.piggybank.storage.CSVExcelStorage(' ', 'NO_MULTILINE', 'WINDOWS') as (timestamp:chararray,  client_socket:chararray);
+-- gunzip -c data/2015_07_22_mktplace_shop_web_log_sample.log.gz > full.log
+input_data = load 'full.log' USING org.apache.pig.piggybank.storage.CSVExcelStorage(' ', 'NO_MULTILINE', 'WINDOWS') as (timestamp:chararray, d1:chararray, client_socket:chararray, d2:chararray, d3:float, d4:float, d5:float, d6:int, d7:int, d8:int, d9:int, d10:chararray, d11:chararray, d12:chararray, d13:chararray);
+-- input_data = load 'sample.log' USING org.apache.pig.piggybank.storage.CSVExcelStorage(' ', 'NO_MULTILINE', 'WINDOWS') as (timestamp:chararray, d1:chararray, client_socket:chararray, d2:chararray, d3:float, d4:float, d5:float, d6:int, d7:int, d8:int, d9:int, d10:chararray, d11:chararray, d12:chararray, d13:chararray);
 
 -- Clean up the data from fields that will not be used
 clean_data = FOREACH input_data GENERATE timestamp as timestamp, SUBSTRING(client_socket,0,INDEXOF(client_socket,':',1)) as ipaddress;
@@ -46,4 +48,5 @@ answer2 = LIMIT global_avg 10;
 answer3 = LIMIT hit_stats 10;
 answer4 = LIMIT engaged_users 10;
 
-
+dump answer4;
+describe answer4;
