@@ -1,4 +1,4 @@
-REGISTER /usr/local/Cellar/pig/0.16.0/libexec/lib/piggybank.jar;
+REGISTER piggybank.jar;
 REGISTER datafu.jar;
 DEFINE Sessionize datafu.pig.sessions.Sessionize('900s');
 
