@@ -5,8 +5,8 @@ import uuid
 conf = SparkConf().setMaster("local").setAppName("PayTM")
 sc = SparkContext(conf=conf)
 SESSION_THRESHOLD = 15*60
-INPUT_FILE='sample.log'
-#INPUT_FILE='full.log'
+#INPUT_FILE='sample.log'
+INPUT_FILE='full.log'
 
 def get_data(elem):
     """
@@ -22,6 +22,17 @@ def get_data(elem):
     else:
         url=fields[12]
     return (ip, {'ts': ts, 'url': url})
+
+def avg_user_sessions(elem):
+    """
+    Get the average length of the sessions associated to user/IP
+    :param elem: list of dicts of all sessions
+    :return: K-V tuple of the length average and IP address
+    """
+    sum = 0.0
+    for s in elem:
+        sum += s['length']
+    return (sum/len(elem),elem[0]['ip'])
 
 def tag_sessions(elem):
     """
@@ -67,11 +78,15 @@ logs = sc.textFile(INPUT_FILE)
 # 1)
 sessions = logs.map(get_data).groupByKey().flatMap(tag_sessions)
 
-# 2)
+# 2a) global avg
 total_time = sessions.map(lambda item: item['length']).reduce(lambda a,b: a+b)
-print ("Global session avg: ", total_time / sessions.count())
+#print ("Global session avg: ", total_time / sessions.count())
+
+# 2b) avg per user/IP
+user_avg_session = logs.map(get_data).groupByKey().map(tag_sessions).map(avg_user_sessions).sortByKey(ascending=False)
 
 # 3) The unique hits per session are already included in 1), here we will just sort them using that value as key
+uniq_hits=sessions.map(lambda item: (item['hits'], item)).sortByKey(ascending=False)
 
 # 4)
 engaged_users = sessions.map(lambda item: (item['length'], item)).sortByKey(ascending=False)
@@ -80,8 +95,10 @@ engaged_users = sessions.map(lambda item: (item['length'], item)).sortByKey(asce
 ## Answer section ##
 # limit the answers to 10 entries each, for speed and simplicity
 
-# answer1 = sessions.take(10)
-answer4 = engaged_users.collect()
+#answer1 = sessions.take(10)
+#answer2 = user_avg_session.take(10)
+#answer3 = uniq_hits.take(10)
+answer4 = engaged_users.take(10)
 for out in answer4:
-   print ("***",out)
+   print (out)
 

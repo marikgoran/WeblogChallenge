@@ -27,13 +27,16 @@ Weblog challenge - parsing weblogs with big data tools
 		cd WeblogChallenge
 		gunzip -c data/2015_07_22_mktplace_shop_web_log_sample.log.gz > full.log
 
-- The pyspark code is in python3, so it needs to be have `PYSPARK_PYTHON=python3` in the environment: `PYSPARK_PYTHON=python3 spark-submit sessionize.spark.py`. The latest python3.5.2 from homebrew was used in the development, but 3.2+ should work as well.
-- The Pig code needs to source the datafu.jar and piggybank.jar, which are included in the repo. These libraries allow cleaner import and sessionizing of the dataset. Using established libraries is usually always better then rolling your own. 
+- The pyspark code is in python3, so it needs to be have `PYSPARK_PYTHON=python3` in the environment: `PYSPARK_PYTHON=python3 spark-submit sessionize.spark.py`. The latest python3.5.2 from homebrew was used in the development, but 3.3+ should work as well.
+- The Pig code needs to source the datafu.jar and piggybank.jar, which are included in the repo. These libraries allow cleaner import and sessionizing of the dataset. Using established libraries is usually better then rolling your own, unless there is a good reason for the exception. 
 - The Pig script can be run with `pig -x local sessionize.pig`
 - Both scripts will by default output the answer of the question 4 from the [Processing & Analytical goals] section above.
-- Unfortunately the scripts are not fully automated at the moment, so some commenting and un-commenting in the code are needed in order to get the output for the other questions.
+- Unfortunately the scripts are not fully automated at the moment, so some commenting and un-commenting in the code is needed in order to get the output for the other questions.
 - The Pig script **does not** give a correct answer on question 3 at the moment - that code is in development and should be ready soon.
 
 --
 ###Additional notes and comments:
 - IP addresses do not guarantee distinct users, but this is the limitation of the data. As a bonus, consider what additional data would help make better analytical conclusions
+
+	- Adding a session id/cookie on the web server could be an option. Some load balancers can set the session id as well, when the SSL connection is terminated by them. 
+	- Using the client socket (IP address plus port) can provide better identification, but this is not fully reliable in case when users are behind a NAT on their end. In general, using more fields in the HTTP header would provide better id, like a client socket + user agent + geolocation data if available

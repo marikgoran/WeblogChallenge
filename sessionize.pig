@@ -2,7 +2,6 @@ REGISTER piggybank.jar;
 REGISTER datafu.jar;
 DEFINE Sessionize datafu.pig.sessions.Sessionize('900s');
 
--- gunzip -c data/2015_07_22_mktplace_shop_web_log_sample.log.gz > full.log
 input_data = load 'full.log' USING org.apache.pig.piggybank.storage.CSVExcelStorage(' ', 'NO_MULTILINE', 'WINDOWS') as (timestamp:chararray, d1:chararray, client_socket:chararray, d2:chararray, d3:float, d4:float, d5:float, d6:int, d7:int, d8:int, d9:int, d10:chararray, d11:chararray, d12:chararray, d13:chararray);
 -- input_data = load 'sample.log' USING org.apache.pig.piggybank.storage.CSVExcelStorage(' ', 'NO_MULTILINE', 'WINDOWS') as (timestamp:chararray, d1:chararray, client_socket:chararray, d2:chararray, d3:float, d4:float, d5:float, d6:int, d7:int, d8:int, d9:int, d10:chararray, d11:chararray, d12:chararray, d13:chararray);
 
@@ -40,7 +39,7 @@ global_avg = FOREACH (GROUP session_stats ALL) GENERATE AVG(session_stats.length
 hit_stats = FOREACH session_stats GENERATE session_id, url_hits;
 
 -- -- 4) Find the most engaged users, ie the IPs with the longest session times
-engaged_users = ORDER session_stats BY length;
+engaged_users = ORDER session_stats BY length DESC;
 
 -- limit the answers to 10 entries each, for speed and simplicity
 answer1 = LIMIT session_stats 10;
